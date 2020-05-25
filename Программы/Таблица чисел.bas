@@ -1,0 +1,4 @@
+10 LET N=1
+20 PRINT N; " ";
+30 LET N=N+1
+40 GO TO 20

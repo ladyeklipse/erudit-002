@@ -1,0 +1,5 @@
+10 LET X=1
+20 INPUT N
+30 PRINT N; "*"; X; "="; N*X
+40 LET X=X+1
+50 GO TO 30
