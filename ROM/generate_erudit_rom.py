@@ -3,9 +3,7 @@ import numpy
 
 def hex_2_rgb(hex):
     binary = bin(int(hex, 16))[2:].zfill(8)
-    # print(binary)
     rgb = [(255,255,255) if x=='1' else (0,0,0) for x in binary]
-    # print(rgb)
     return rgb
 
 def getByteChars():
@@ -13,14 +11,12 @@ def getByteChars():
         contents = f.read()
     byte_hex_dump = ['{:02X}'.format(b) for b in contents]
     byte_rus_chars_data = numpy.array(byte_hex_dump[int('3B00', 16):int('3D00',16)])
-    # print(byte_rus_chars_data)
     byte_chars = numpy.array_split(byte_rus_chars_data, 64)
-    # print(byte_chars)
+    byte_rus_chars_array = numpy.array([hex_2_rgb(x) for x in byte_rus_chars_data])
+    byte_rus_chars_array = numpy.array(byte_rus_chars_array)
+    img = Image.fromarray(byte_rus_chars_array.astype('uint8'), mode='RGB')
+    img.save('byte_rus_chars.png')
     return byte_chars
-    # byte_rus_chars_array = numpy.array([hex_2_rgb(x) for x in byte_rus_chars_data])
-    # byte_rus_chars_array = numpy.array(byte_rus_chars_array)
-    # img = Image.fromarray(byte_rus_chars_array.astype('uint8'), mode='RGB')
-    # img.save('byte_rus_chars.png')
 
 def getOriginalDump():
     with open('48.bin', 'rb') as f:
@@ -28,22 +24,17 @@ def getOriginalDump():
     return ['{:02X}'.format(b) for b in contents]
 
 BYTE_CHARS_ORDER = "ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧЪ"
-# for i, char in enumerate(BYTE_CHARS_ORDER):
-#     print(i, char)
 BYTE_CHARS_DICT = dict(zip(BYTE_CHARS_ORDER, getByteChars()))
-# print(BYTE_CHARS_DICT["Е"])
+#Буквы Ё у "Байта" нет, восстановлено по памяти.
 BYTE_CHARS_DICT["Ё"] = numpy.array(['00', '14', '7E', '40', '7C', '40', '7E', '00'])
 
 ERUDIT_CHARS_ORDER = "Ё\\Ъ^_ЮАБЦДЕФГХИЙКЛМНОПЯРСТУЖВЬЫЗШЭЩЧ"
 ERUDIT_CHARS_START = "3ED8"
-# ORIGINAL_CHARS_ORDER = "[\\]^_£abcdefghijklmnopqrstuvwxyz{|}`"
-# ORIGINAL_ERUDIT_DICT = dict(zip(ORIGINAL_CHARS_ORDER, ERUDIT_CHARS_ORDER))
-# print(ORIGINAL_ERUDIT_DICT)
 ERUDIT_CHARS_START_CODE = 91
 ERUDIT_CHARS_CODES = list(range(91,127))
 ERUDIT_CHARS_CODES_DICT = dict(zip(ERUDIT_CHARS_ORDER, ERUDIT_CHARS_CODES))
 ERUDIT_CODES_CHARS_DICT = dict(zip(ERUDIT_CHARS_CODES, ERUDIT_CHARS_ORDER))
-print(ERUDIT_CHARS_CODES_DICT)
+
 originalRomDump = getOriginalDump()
 for i in range(0, len(ERUDIT_CHARS_ORDER)):
     char_start = int(ERUDIT_CHARS_START, 16)+i*8
@@ -79,12 +70,12 @@ ERUDIT_ERROR_MESSAGES = [
     "НЕТ МЕСТА ДЛЯ СТРОКИ",
     "STOP В INPUT'Е",
     "FOR БЕЗ NEXT",
-    "?",
+    "?", #Сообщение J не задокументировано, при работе с Эрудитом я его никогда не видела.
     "НЕПРАВИЛЬНЫЙ ЦВЕТ",
     "BREAK В ПРОГРАММЕ",
     "ПЛОХОЙ RAMTOP",
     "НЕТ ОПЕРАТОРА",
-    "НЕПРАВИЛЬНЫЙ ПОТОК",
+    "НЕПРАВИЛЬНЫЙ ПОТОК", #Не задокументировано, восстановлено по памяти.
     "FN БЕЗ DEF",
     "ОШИБКА ПАРАМЕТРА",
     "ОШИБКА ЗАГРУЗКИ"
